@@ -3,10 +3,8 @@
 </h1>
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/a005d524-6abd-42ef-a85c-ef2cd5681b5f" width="400px"style=> 
+<img src="https://github.com/user-attachments/assets/ba51bc77-c6e1-40a5-88e6-7a9d11811428" width="400px"style=> 
 </div>
-
-
 
 ## Requirements
 - This library works with the follwing OS:
