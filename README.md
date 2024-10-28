@@ -1,5 +1,12 @@
-# cli-lib
-Command Line Interface library, for developing CLI applications and games in C. It has functions to access keyboard, screen and manage timing tasks.
+<h1 align="center">
+  🕹️ Pong Game 🕹️
+</h1>
+
+<div align="center">
+<img src="https://github.com/user-attachments/assets/a005d524-6abd-42ef-a85c-ef2cd5681b5f" width="400px"style=> 
+</div>
+
+
 
 ## Requirements
 - This library works with the follwing OS:
