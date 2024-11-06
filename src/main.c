@@ -59,6 +59,75 @@ static int delay = -1;
 int x = 34, y = 12;
 int incX = 1, incY = 1;
 
+void screenHomeCursor();
+void screenShowCursor();
+void screenHideCursor();
+void screenClear();
+void screenUpdate();
+void screenSetNormal();
+void screenSetBold();
+void screenSetBlink();
+void screenSetReverse();
+void screenBoxEnable();
+void screenBoxDisable();
+void screenGotoxy(int x, int y);
+void screenDrawBorders();
+void screenInit(int drawBorders);
+void screenDestroy();
+void screenSetColor(screenColor fg, screenColor bg);
+void timerInit(int valueMilliSec);
+void timerDestroy();
+void timerUpdateTimer(int valueMilliSec);
+int getTimeDiff();
+int timerTimeOver();
+void timerPrint();
+void keyboardInit();
+void keyboardDestroy();
+int keyhit();
+int readch();
+void printHello(int nextX, int nextY);
+void printKey(int ch);
+
+int main() {
+    static int ch = 0;
+
+    screenInit(1);
+    keyboardInit();
+    timerInit(50);
+
+    printHello(x, y);
+    screenUpdate();
+
+    while (ch != 10) //enter
+    {
+        // Handle user input
+        if (keyhit()) {
+            ch = readch();
+            printKey(ch);
+            screenUpdate();
+        }
+
+        // Update game state (move elements, verify collision, etc)
+        if (timerTimeOver() == 1) {
+            int newX = x + incX;
+            if (newX >= (MAXX - strlen("Hello World") - 1) || newX <= MINX + 1) incX = -incX;
+            int newY = y + incY;
+            if (newY >= MAXY - 1 || newY <= MINY + 1) incY = -incY;
+
+            printKey(ch);
+            printHello(newX, newY);
+
+            screenUpdate();
+        }
+    }
+
+    keyboardDestroy();
+    screenDestroy();
+    timerDestroy();
+
+    return 0;
+}
+
 void screenHomeCursor() {
     printf("%s%s", ESC, HOMECURSOR);
 }
@@ -279,48 +348,4 @@ void printKey(int ch) {
     while (keyhit()) {
         printf("%d ", readch());
     }
-}
-
-int main() {
-    static int ch = 0;
-
-    screenInit(1);
-    keyboardInit();
-    timerInit(50);
-
-    printHello(x, y);
-    screenUpdate();
-
-    while (ch != 10) //enter
-    {
-        // Handle user input
-        if (keyhit()) {
-            ch = readch();
-            printKey(ch);
-            screenUpdate();
-        }
-
-        // Update game state (move elements, verify collision, etc)
-        if (timerTimeOver() == 1) {
-            int newX = x + incX;
-            if (newX >= (MAXX - strlen("Hello World") - 1) || newX <= MINX + 1) incX = -incX;
-            int newY = y + incY;
-            if (newY >= MAXY - 1 || newY <= MINY + 1) incY = -incY;
-
-            printKey(ch);
-            printHello(newX, newY);
-
-            screenUpdate();
-        }
-    }
-
-    keyboardDestroy();
-    screenDestroy();
-    timerDestroy();
-
-    return 0;
-}
-
-
-    return 0;
 }
