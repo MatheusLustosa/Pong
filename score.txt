@@ -1,3 +1,6 @@
 lucas 4 x 4
 e 4 x 4
 lucas 4 x 4
+oi 4 x 1
+2 4 x 1
+2 4 x 2
