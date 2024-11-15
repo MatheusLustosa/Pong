@@ -156,7 +156,7 @@ void showAsciiArt() {
 }
 void startGame(int singlePlayerMode) {
     // Alocar memória para o campo
-    char *field = (char *)malloc(FIELD_HEIGHT * sizeof(char *));
+    char **field = (char **)malloc(FIELD_HEIGHT * sizeof(char *));
     for (int i = 0; i < FIELD_HEIGHT; i++) {
         field[i] = (char *)malloc(FIELD_WIDTH * sizeof(char));
     }
