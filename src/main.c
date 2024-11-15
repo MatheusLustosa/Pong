@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <termios.h>
 #include "keyboard.h"
 #include "screen.h"
 #include "timer.h"
@@ -11,7 +12,7 @@
 #define FIELD_HEIGHT 24
 #define PADDLE_WIDTH 1
 #define PADDLE_HEIGHT 6
-#define PADDLE_MOVE_SPEED 2
+#define PADDLE_MOVE_SPEED 10
 #define INITIAL_LIVES 4
 #define BALL_INITIAL_X (FIELD_WIDTH / 2)
 #define BALL_INITIAL_Y (FIELD_HEIGHT / 2)
@@ -94,6 +95,8 @@ void render(char **field, Ball *ball, Paddle *p1, Paddle *p2) {
         }
         putchar('\n');
     }
+
+    fflush(stdout); // Garante que a saída seja exibida
 }
 
 void writeScoreToFile(Paddle *winner) {
@@ -130,30 +133,31 @@ void printFinalScreen(Paddle *p1, Paddle *p2) {
     printf("Pressione Enter para voltar ao menu...");
     while (getchar() != '\n') {}
 }
+
 void showAsciiArt() {
     screenClear();
     printf("\n");
-    printf("                 .::::.                           \n");
-    printf("            ..:::.        .::::::.        ..::.   \n");
-    printf("        .############=.    ::::::.   .=############.\n");
-    printf("      -#################+   ....   =#################-\n");
-    printf("    .####################=      -####################.\n");
-    printf("    =######################+    +######################=\n");
-    printf("   .########################+  =########################.\n");
-    printf("   .#########################:.#########################:\n");
-    printf("   .#########################-:#########################.\n");
-    printf("   .+########################:.########################+.\n");
-    printf("    :######################*-  -+######################: \n");
-    printf("     -###################++.  .++###################-  \n");
-    printf("      .#################++++:  :++++###############.   \n");
-    printf("        -#############+++++++..=++++++*############-     \n");
-    printf("          .=########+===++++++++++++===+*#######=.       \n");
-    printf("                          .=+++++.                        \n");
-    printf("                         -++++++++-                       \n");
-    printf("                       :+++++::+++++-                     \n");
-    printf("                       :+++-    :+++-                     \n");
+    printf("          /\\_____/\\               /\\_____/\\\n");
+    printf("         /  o   o  \\             /  o   o  \\ \n");
+    printf("        ( ==  ^  == )           ( ==  ^  == )\n");
+    printf("         )    U    (             )    U    (\n");
+    printf("        /\\_______/\\             /\\_______/\\\n");
+    printf("       /   |   |   \\           /   |   |   \\ \n");
+    printf("      (    |   |    )         (    |   |    )\n");
+    printf("      (____|___|____)         (____|___|____)\n");
     printf("\n\n");
 }
+
+void hideCursor() {
+    printf("\033[?25l"); // Código ANSI para ocultar o cursor
+    fflush(stdout);
+}
+
+void showCursor() {
+    printf("\033[?25h"); // Código ANSI para mostrar o cursor
+    fflush(stdout);
+}
+
 void startGame(int singlePlayerMode) {
     // Alocar memória para o campo
     char **field = (char **)malloc(FIELD_HEIGHT * sizeof(char *));
@@ -171,7 +175,16 @@ void startGame(int singlePlayerMode) {
     float speedMultiplier = 1.0;
 
     // Variável para controlar a velocidade do paddle do computador
-    int computerPaddleSpeed = 2; // Aumentado para 2
+    float computerPaddleSpeed = 1.5; // Aumentado para 2
+
+    // Salvar as configurações atuais do terminal
+    struct termios oldt, newt;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+
+    // Habilitar modo canônico e echo
+    newt.c_lflag |= (ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
     // Limpar buffer de entrada
     int ch;
@@ -180,6 +193,8 @@ void startGame(int singlePlayerMode) {
     printf("Digite o nome do Jogador 1: ");
     if (fgets(p1.name, PLAYER_NAME_MAX_LENGTH, stdin) == NULL) {
         perror("Erro ao ler o nome do Jogador 1");
+        // Restaurar configurações originais antes de retornar
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
         return;
     }
     p1.name[strcspn(p1.name, "\n")] = '\0';  // Remover newline
@@ -188,12 +203,20 @@ void startGame(int singlePlayerMode) {
         printf("Digite o nome do Jogador 2: ");
         if (fgets(p2.name, PLAYER_NAME_MAX_LENGTH, stdin) == NULL) {
             perror("Erro ao ler o nome do Jogador 2");
+            // Restaurar configurações originais antes de retornar
+            tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
             return;
         }
         p2.name[strcspn(p2.name, "\n")] = '\0';  // Remover newline
     } else {
         strcpy(p2.name, "Computador");
     }
+
+    // Restaurar as configurações originais do terminal
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+
+    // Ocultar o cursor
+    hideCursor();
 
     while (p1.lives > 0 && p2.lives > 0) {
         // Limpar o campo
@@ -221,8 +244,8 @@ void startGame(int singlePlayerMode) {
 
         // Verificar se a bola saiu dos limites esquerdo ou direito
         if ((int)ball.x <= 0) {
-            p2.lives--;
-            p1.score++;
+            p1.lives--;
+            p2.score++;
             // Reiniciar a bola e velocidade
             ball.x = BALL_INITIAL_X;
             ball.y = BALL_INITIAL_Y;
@@ -230,8 +253,8 @@ void startGame(int singlePlayerMode) {
             ball.dy = BALL_SPEED_Y_INITIAL;
             speedMultiplier = 1.0;
         } else if ((int)ball.x >= FIELD_WIDTH - 1) {
-            p1.lives--;
-            p2.score++;
+            p2.lives--;
+            p1.score++;
             // Reiniciar a bola e velocidade
             ball.x = BALL_INITIAL_X;
             ball.y = BALL_INITIAL_Y;
@@ -287,6 +310,9 @@ void startGame(int singlePlayerMode) {
         while (!timerTimeOver()) {}
     }
 
+    // Mostrar o cursor novamente
+    showCursor();
+
     // Liberar memória
     for (int i = 0; i < FIELD_HEIGHT; i++) {
         free(field[i]);
@@ -296,8 +322,6 @@ void startGame(int singlePlayerMode) {
     // Exibir a tela final
     printFinalScreen(&p1, &p2);
 }
-
-
 
 void showRules() {
     screenClear();

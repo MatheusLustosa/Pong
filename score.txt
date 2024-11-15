@@ -4,3 +4,8 @@ lucas 4 x 4
 oi 4 x 1
 2 4 x 1
 2 4 x 2
+1 4 x 3
+1 4 x 1
+1 4 x 4
+Computador 4 x 1
+1 4 x 4
