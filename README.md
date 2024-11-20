@@ -1,10 +1,5 @@
-<h1 align="center">
-  🕹️ Pong Game 🕹️
-</h1>
-
-<div align="center">
-<img src="https://github.com/user-attachments/assets/ba51bc77-c6e1-40a5-88e6-7a9d11811428" width="400px"style=> 
-</div>
+# cli-lib
+Command Line Interface library, for developing CLI applications and games in C. It has functions to access keyboard, screen and manage timing tasks.
 
 Nosso jogo se trata se chama Pong, um clássico jogo de tênis eletrônico em que dois jogadores (ou um jogador contra o computador) controlam raquetes verticais e tentam rebater uma bola que se move pelo campo. O objetivo é evitar que a bola ultrapasse a raquete do jogador, enquanto tenta fazer com que a bola passe pela raquete do adversário, fazendo-o perder vidas.
 
